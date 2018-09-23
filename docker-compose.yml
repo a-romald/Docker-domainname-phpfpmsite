@@ -1,0 +1,85 @@
+version: '2'
+ 
+networks:
+  wp-proxy:
+    driver: bridge
+  database:
+    driver: bridge
+ 
+ 
+services:
+ 
+  nginx:
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - wp-proxy
+
+
+  site:
+    build:
+      context: ./nginx
+      args:
+        - PHP_UPSTREAM=php-fpm
+    volumes:
+      - ./nginx/sites:/etc/nginx/sites-available 
+      - ./public:/var/www/public
+    expose:
+      - "80"
+    environment:
+      - VIRTUAL_HOST=site.local
+    depends_on:
+      - php-fpm
+    networks:
+      - wp-proxy 
+ 
+  
+  php-fpm:
+    build:
+      context: ./php-fpm
+    environment:
+      VIRTUAL_HOST : site.local
+    volumes:
+      - ./php-fpm/php.ini:/usr/local/etc/php/php.ini
+      - ./public:/var/www/public
+    expose:
+      - "9000"
+    networks:
+      - wp-proxy
+      - database       
+ 
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql-machine
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mysql:/var/lib/mysql
+    networks:
+      - database
+    environment:
+      MYSQL_ROOT_PASSWORD   : mdb
+      MYSQL_PASSWORD        : mdb
+      MYSQL_USER            : mdb
+      MYSQL_DATABASE        : mdb
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+        - 8080:80
+    networks:
+        - database
+    environment:
+        - PMA_HOST=mysql
+        - PMA_USER=mdb
+        - PMA_PASSWORD=mdb
+    depends_on:
+        - mysql
+
