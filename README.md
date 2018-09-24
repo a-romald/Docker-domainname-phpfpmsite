@@ -27,7 +27,8 @@ Password 'mdb' and database 'mdb'.
 
 	USE mdb;
 
-Create table `persons` and insert data from persons.sql
+Create table `persons` and insert data from persons.sql.
+
 Exit mysql with command: \q
 
 This application comprises two php-files with phpinfo and retrieve simple data. To run them type in browser:
