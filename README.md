@@ -6,7 +6,7 @@ Features
 
 Init project:
 
-Install docker, then type in the root of the project:
+Install docker and docker-compose, then type in the root of the project:
 
     docker-compose up -d
 
@@ -39,5 +39,13 @@ This application comprises two php-files with phpinfo and retrieve simple data. 
 To run phpmyadmin type:
 
 	http://site.local:8080/
+
+To print ids of all running containers type:
+
+    docker ps -a
+
+To stop docker application type:
+
+    docker-compose down
 
 This application comprises domain name and nginx container, so it could be used in production mode.
